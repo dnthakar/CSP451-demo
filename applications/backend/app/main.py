@@ -1,26 +1,39 @@
 from fastapi import FastAPI
-from app.services import crud
+from fastapi.responses import JSONResponse
 
 app = FastAPI()
 
+# Dummy product data
+products = [
+    {"id": "1", "name": "Laptop", "category": "Electronics", "price": 999.99},
+    {"id": "2", "name": "Shoes", "category": "Fashion", "price": 49.99}
+]
+
+cart = []
+orders = []
+
 @app.get("/")
-def home():
-    return {"message": "CloudMart API Running"}
+async def home():
+    return JSONResponse(content={"message": "Welcome to CloudMart!"})
 
 @app.get("/api/v1/products")
-def list_products(category: str = None):
-    return crud.get_products(category)
+async def get_products():
+    return products
 
 @app.get("/api/v1/cart")
-def get_cart(user_id: str):
-    return crud.get_cart(user_id)
+async def get_cart():
+    return cart
 
 @app.post("/api/v1/cart/items")
-def add_cart_item(item: dict):
-    crud.add_to_cart(item)
-    return {"message": "Item added to cart"}
+async def add_to_cart(item: dict):
+    cart.append(item)
+    return {"status": "added"}
 
 @app.post("/api/v1/orders")
-def create_order(order: dict):
-    crud.create_order(order)
-    return {"message": "Order created successfully"}
+async def create_order(order: dict):
+    orders.append(order)
+    return {"status": "confirmed"}
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
