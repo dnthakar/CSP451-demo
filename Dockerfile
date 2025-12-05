@@ -1,29 +1,16 @@
-# CloudMart API - Production Dockerfile
-FROM python:3.11-slim
+FROM python:3.11-slim AS base
 
+ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 
-# Install dependencies
-RUN pip install --no-cache-dir fastapi uvicorn azure-cosmos pydantic
+# install dependencies
+COPY applications/backend/requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
 
-# Copy application code
-COPY deploy/main_cosmosdb.py /app/main.py
+# copy backend code
+COPY applications/backend /app
 
-# Expose port
 EXPOSE 80
 
-# Run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
-```
-
-### 5.2 Build and Push to Docker Hub
-
-```bash
-# Build image
-$ docker build -t dcjoker/cloudmart-api:latest .
-
-# Login to Docker Hub
-$ docker login -u dcjoker
-
-# Push image
-$ docker push dcjoker/cloudmart-api:latest
+# run uvicorn
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
