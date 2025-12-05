@@ -1,2 +1,5 @@
 fastapi
-uvicorn
+uvicorn[standard]
+azure-cosmos
+python-dotenv
+
